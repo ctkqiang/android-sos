@@ -4,4 +4,7 @@
     <string name="start_location">Start Location Service {1} </string>
     <string name="stop_location">Stop Location Service {0} </string>
     <string name="getlast">Get Last Location</string>
+    <string name="Latitude">Latitude</string>
+    <string name="Longitude">Longitude</string>
+    <string name="last_update">Last Updated on:  </string>
 </resources>

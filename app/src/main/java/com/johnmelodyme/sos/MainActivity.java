@@ -1,21 +1,24 @@
 package com.johnmelodyme.sos;
-
-import androidx.annotation.BinderThread;
+/*
+* I CREATED THIS APPLICATION FOR SECURITY PURPOSES,
+* FOR NOT SPYING PURPOSES BUT RATHER LOVE ONE CAN
+* SEND IMMEDIATE REAL TIME LOCATION WHEN THEY ARE
+* IN DANGER. I AM NOT RESPONSIBLE FOR ANY MALICIOUS
+* USE OF THIS APPLICATION.
+*
+* (JOHN MELODY'S OPEN SOURCE PROJECT)
+* ALL RIGHT RESERVED © JOHN MELODY MELISSA COPYRIGHT
+ */
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -23,18 +26,33 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
-
 import java.text.DateFormat;
 import java.util.Date;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 /**
  * @AUTHOR: JOHN MELODY MELIISA
  * @PROJECT: S.O.S ANDROID
- * @INSPIRED_BY__MY_GIRLFRIEND
+ * @INSPIRED_BY__MY_GIRLFRIEND: SIN DEE 🥰
  * @DESCRIPTION: CREATED FOR WOMEN SECURITY ::
  */
 public class MainActivity extends AppCompatActivity {
+    // BUTTERKNIFE::
+    // TODO :: READ ON THIS::
+    @BindView(R.id.result)
+    TextView THE_LOCATION_RESULT;
+
+    @BindView(R.id.lasttupdate)
+    TextView THE_LAST_UPDATE;
+
+    @BindView(R.id.start)
+    Button START_LOCATION;
+
+    @BindView(R.id.stop)
+    Button STOP_LOCATION;
+
     private static final String TAG = MainActivity.class.getName();
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 0b10011100010000;
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 0b1001110001000;
@@ -56,12 +74,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onStart(){
+        System.out.println("WELCOME TO SOS");
         Log.w(TAG, "onStart():: " + "THE APPLICATION STARTED...");
         super.onStart();
         GPS_STATUS.setText(" ");
-        for (int g = 0; g < 3; g++) {
+        for (int g = 0; g < 0b11; g++) {
             CheckGPS();
         }
+        Log.w(TAG, "S.O.S: " + "CHECKING GPS....");
     }
 
     private void CheckGPS() {
@@ -69,11 +89,11 @@ public class MainActivity extends AppCompatActivity {
         gps = LOCATION_MANAGER.isProviderEnabled(LOCATION_MANAGER.GPS_PROVIDER);
         if (gps == true){
             GPS_STATUS.setText("GPS IS ENABLED");
-            Log.w(TAG, "GPS: " + "GPS IS ENABLED");
+            Log.w(TAG, "S.O.S: " + "GPS IS ENABLED");
         } else {
             GPS_STATUS.setTextColor(Color.BLACK);
             GPS_STATUS.setText("GPS IS NOT ENABLED");
-            Log.w(TAG, "GPS: " + "GPS IS NOT ENABLED");
+            Log.w(TAG, "S.O.S: " + "GPS IS NOT ENABLED");
         }
     }
 
@@ -81,10 +101,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(MainActivity.this);
         GPS_STATUS = findViewById(R.id.gps);
         START_LOCATION_UPDATES = findViewById(R.id.start);
-
-        Context context;
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
         settingsClient = LocationServices.getSettingsClient(MainActivity.this);
         locationCallback = new LocationCallback(){
@@ -94,7 +113,47 @@ public class MainActivity extends AppCompatActivity {
                 // WHEN LOCATION IS RECEIVE ::
                 currentLocation = locationResult.getLastLocation();
                 LastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+                
+                UPDATE_LOCATION_UI();
             }
         };
+
+        RequestingLocationUpdates = false;
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+        locationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+        locationSettingsRequest = builder.build();
+    }
+
+    // Update the UI displaying the location data and toggling the buttons:
+    @SuppressLint("SetTextI18n")
+    private void UPDATE_LOCATION_UI() {
+        if(currentLocation != null){
+            String LA, LO, TAGGER;
+            LA = getResources().getString(R.string.Latitude);
+            LO = getResources().getString(R.string.Longitude);
+            TAGGER = getResources().getString(R.string.last_update);
+            THE_LOCATION_RESULT.setText(LA + currentLocation.getLatitude() + LO + currentLocation.getLongitude());
+            // GIVING A ```BLINK``` EFFECT ON TEXTVIEW:
+            THE_LOCATION_RESULT.setAlpha(0);
+            THE_LOCATION_RESULT.animate().alpha(1).setDuration(300);
+            // LAST UPDATED TIME :
+            THE_LAST_UPDATE.setText(TAGGER + " " + THE_LAST_UPDATE);
+        }
+        TOGGLE_BUTTON();
+    }
+
+    private void TOGGLE_BUTTON() {
+        if (RequestingLocationUpdates){
+            START_LOCATION.setEnabled(false);
+            STOP_LOCATION.setEnabled(true);
+        } else {
+            START_LOCATION.setEnabled(true);
+            STOP_LOCATION.setEnabled(false);
+        }
     }
 }

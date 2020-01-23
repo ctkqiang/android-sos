@@ -9,17 +9,17 @@
 
     <TextView
         android:id="@+id/result"
-        android:layout_width="382dp"
+        android:layout_width="match_parent"
         android:layout_height="61dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="176dp"
+        android:layout_marginTop="104dp"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/lasttupdate"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.51"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/get" />
 
     <TextView
         android:id="@+id/gps"
@@ -72,5 +72,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/start" />
+
+    <TextView
+        android:id="@+id/lasttupdate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="11dp"
+        android:layout_marginBottom="147dp"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/result" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
