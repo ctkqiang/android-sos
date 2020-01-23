@@ -28,4 +28,11 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.kongzue.dialog:dialog:2.5.2'
     implementation 'com.github.f0ris.sweetalert:library:1.6.2'
+    // location play services
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    // dexter runtime permissions
+    implementation 'com.karumi:dexter:4.2.0'
+    // ButterKnife view binding
+    //implementation 'com.jakewharton:butterknife:8.8.1'
+   // annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }

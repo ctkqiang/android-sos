@@ -4,20 +4,73 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/result"
+        android:layout_width="382dp"
+        android:layout_height="61dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="176dp"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/gps"
         android:layout_width="match_parent"
         android:layout_height="19dp"
+        android:background="@color/colorPrimary"
         android:fontFamily="@font/aclonica"
         android:text="@string/gps_status"
-        android:background="@color/colorPrimary"
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/start"
+        android:layout_width="228dp"
+        android:background="@android:color/white"
+        android:layout_height="59dp"
+        android:text="@string/start_location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/gps" />
+
+    <Button
+        android:id="@+id/get"
+        android:layout_width="228dp"
+        android:layout_height="59dp"
+        android:layout_marginStart="92dp"
+        android:layout_marginTop="32dp"
+        android:background="@android:color/white"
+        android:layout_marginEnd="91dp"
+        android:text="@string/getlast"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stop" />
+
+    <Button
+        android:id="@+id/stop"
+        android:layout_width="228dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="32dp"
+        android:enabled="false"
+        android:layout_marginBottom="32dp"
+        android:background="@android:color/white"
+        android:text="@string/stop_location"
+        app:layout_constraintBottom_toTopOf="@+id/get"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/start" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
