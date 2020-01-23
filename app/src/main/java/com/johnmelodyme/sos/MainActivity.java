@@ -57,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CHECK_SETTINGS = 0b1100100;
     private String mPermission = Manifest.permission.ACCESS_FINE_LOCATION;
     private LocationManager LOCATION_MANAGER;
-    private TextView GPS_STATUS;
-    private Button START_LOCATION_UPDATES;
+    private TextView GPS_STATUS, LAST_UPDATE;
+    private Button START_LOCATION_UPDATES, STOP_LOCATION_UPDATES, GET_LAST_UPDATE;
     private Boolean RequestingLocationUpdates;
     private boolean gps;
     private String LastUpdateTime;
@@ -99,10 +99,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // _BUTTERKNIFE_
         ButterKnife.bind(MainActivity.this);
+        // _RESTORING_VALUES_FROM_SAVED_INSTANCE_STATE_
         RESTORE_VALUES_FROM_BUNDLE(savedInstanceState);
+        // DECLARATION:
         GPS_STATUS = findViewById(R.id.gps);
+        LAST_UPDATE = findViewById(R.id.lasttupdate);
         START_LOCATION_UPDATES = findViewById(R.id.start);
+        STOP_LOCATION_UPDATES = findViewById(R.id.stop);
+        GET_LAST_UPDATE = findViewById(R.id.get);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
         settingsClient = LocationServices.getSettingsClient(MainActivity.this);
         locationCallback = new LocationCallback(){
@@ -126,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
         locationSettingsRequest = builder.build();
+
     }
 
     // UPDATE THE USER INTERFACE THE LOCATION DATA AND TOGGLING THE BUTTONS:
@@ -171,4 +178,15 @@ public class MainActivity extends AppCompatActivity {
         }
         UPDATE_LOCATION_UI();
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("is_requesting_updates",RequestingLocationUpdates);
+        outState.putParcelable("last_known_location", currentLocation);
+        outState.putString("last_updated_on", LastUpdateTime);
+    }
+
+    // TODO startLocationUpdates();
+
 }
