@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">S.O.S</string>
+    <string name="app_name">{ S.O.S } </string>
+    <string name="gps_status">GPS STATUS</string>
 </resources>
