@@ -169,5 +169,6 @@ public class MainActivity extends AppCompatActivity {
                 LastUpdateTime = savedInstanceState.getString("last_updated_on");
             }
         }
+        UPDATE_LOCATION_UI();
     }
 }
