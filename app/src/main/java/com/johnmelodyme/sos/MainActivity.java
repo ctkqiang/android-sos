@@ -31,16 +31,14 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-
 /**
  * @AUTHOR: JOHN MELODY MELIISA
  * @PROJECT: S.O.S ANDROID
- * @INSPIRED_BY__MY_GIRLFRIEND: SIN DEE 🥰
+ * @INSPIRED_BY__MY_GIRLFRIEND: SIN DEE 🥰🥰🥰
  * @DESCRIPTION: CREATED FOR WOMEN SECURITY ::
  */
 public class MainActivity extends AppCompatActivity {
     // BUTTERKNIFE::
-    // TODO :: READ ON THIS::
     @BindView(R.id.result)
     TextView THE_LOCATION_RESULT;
 
@@ -102,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(MainActivity.this);
+        RESTORE_VALUES_FROM_BUNDLE(savedInstanceState);
         GPS_STATUS = findViewById(R.id.gps);
         START_LOCATION_UPDATES = findViewById(R.id.start);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
@@ -129,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         locationSettingsRequest = builder.build();
     }
 
-    // Update the UI displaying the location data and toggling the buttons:
+    // UPDATE THE USER INTERFACE THE LOCATION DATA AND TOGGLING THE BUTTONS:
     @SuppressLint("SetTextI18n")
     private void UPDATE_LOCATION_UI() {
         if(currentLocation != null){
@@ -154,6 +153,21 @@ public class MainActivity extends AppCompatActivity {
         } else {
             START_LOCATION.setEnabled(true);
             STOP_LOCATION.setEnabled(false);
+        }
+    }
+
+    // RESTORING VALUES FROM SAVED INSTANCE STATE:
+    private void RESTORE_VALUES_FROM_BUNDLE(Bundle savedInstanceState){
+        if (savedInstanceState != null){
+            if (savedInstanceState.containsKey("is_requesting_updates")){
+                RequestingLocationUpdates = savedInstanceState.getBoolean("is_requesting_updates");
+            }
+            if (savedInstanceState.containsKey("last_known_location")){
+                currentLocation = savedInstanceState.getParcelable("last_known_location");
+            }
+            if (savedInstanceState.containsKey("last_updated_on")) {
+                LastUpdateTime = savedInstanceState.getString("last_updated_on");
+            }
         }
     }
 }
