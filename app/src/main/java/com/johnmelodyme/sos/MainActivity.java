@@ -9,6 +9,7 @@ package com.johnmelodyme.sos;
 * (JOHN MELODY'S OPEN SOURCE PROJECT)
 * ALL RIGHT RESERVED © JOHN MELODY MELISSA COPYRIGHT
  */
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -16,16 +17,31 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
+
 import java.text.DateFormat;
 import java.util.Date;
 import butterknife.BindView;
@@ -102,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         // _BUTTERKNIFE_
         ButterKnife.bind(MainActivity.this);
         // _RESTORING_VALUES_FROM_SAVED_INSTANCE_STATE_
-        RESTORE_VALUES_FROM_BUNDLE(savedInstanceState);
+        //RESTORE_VALUES_FROM_BUNDLE(savedInstanceState);
         // DECLARATION:
         GPS_STATUS = findViewById(R.id.gps);
         LAST_UPDATE = findViewById(R.id.lasttupdate);
@@ -133,6 +149,55 @@ public class MainActivity extends AppCompatActivity {
                 .addLocationRequest(locationRequest);
         locationSettingsRequest = builder.build();
 
+        STOP_LOCATION_UPDATES.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // REQUESTING ```ACCESS_FINE_LOCATION``` USING DEXTER LIBRARY
+                Dexter.withActivity(MainActivity.this)
+                        .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                        .withListener(new PermissionListener() {
+                            @Override
+                            public void onPermissionGranted(PermissionGrantedResponse response) {
+                                RequestingLocationUpdates = true;
+                                START_LOCATION_UPDATES_METHODS();
+                            }
+
+                            @Override
+                            public void onPermissionDenied(PermissionDeniedResponse response) {
+
+                            }
+
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+
+                            }
+                        });
+            }
+        });
+    }
+
+    private void START_LOCATION_UPDATES_METHODS() {
+        settingsClient
+                .checkLocationSettings(locationSettingsRequest)
+                .addOnSuccessListener(MainActivity.this, new OnSuccessListener<LocationSettingsResponse>() {
+                    @SuppressLint("MissingPermission")
+                    @Override
+                    public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                        Log.w(TAG, "START_LOCATION_UPDATES_METHODS ===> " + "All location settings are satisfied.");
+                        TOASTER("Started Location Updates...");
+                        // NO-INSPECTION MISSING_PERMISSION:
+                        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+                        UPDATE_LOCATION_UI();
+                    }
+                }).addOnFailureListener(MainActivity.this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        int STATUS_CODE = ((ApiException) exception).getStatusCode();
+                        switch (STATUS_CODE){
+                           // TODO "Still figuring"
+                        }
+                    }
+        });
     }
 
     // UPDATE THE USER INTERFACE THE LOCATION DATA AND TOGGLING THE BUTTONS:
@@ -187,6 +252,10 @@ public class MainActivity extends AppCompatActivity {
         outState.putString("last_updated_on", LastUpdateTime);
     }
 
-    // TODO startLocationUpdates();
-
+    // TOAST.MAKE_TEXT METHODS():
+    public void TOASTER(String toast){
+        Toast.makeText(MainActivity.this, toast,
+                Toast.LENGTH_SHORT)
+                .show();
+    }
 }
