@@ -9,47 +9,19 @@ package com.johnmelodyme.sos;
 * (JOHN MELODY'S OPEN SOURCE PROJECT)
 * ALL RIGHT RESERVED © JOHN MELODY MELISSA COPYRIGHT
  */
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Intent;
+import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Looper;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.single.PermissionListener;
-import java.text.DateFormat;
-import java.util.Date;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+import com.google.android.gms.location.LocationListener;
 
 /**
  * @AUTHOR: JOHN MELODY MELIISA
@@ -58,44 +30,21 @@ import butterknife.OnClick;
  * @DESCRIPTION: CREATED FOR WOMEN SECURITY ::
  */
 public class MainActivity extends AppCompatActivity {
-    // BUTTERKNIFE::
-    @BindView(R.id.result)
-    TextView THE_LOCATION_RESULT;
-
-    @BindView(R.id.lasttupdate)
-    TextView THE_LAST_UPDATE;
-
-    @BindView(R.id.start)
-    Button START_LOCATION;
-
-    @BindView(R.id.stop)
-    Button STOP_LOCATION;
-
     private static final String TAG = MainActivity.class.getName();
-    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 0b10011100010000;
-    private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = 0b1001110001000;
-    private static final int REQUEST_CHECK_SETTINGS = 0b1100100;
-    private String mPermission = Manifest.permission.ACCESS_FINE_LOCATION;
+    private int g;
     private LocationManager LOCATION_MANAGER;
-    private TextView GPS_STATUS, LAST_UPDATE;
+    private TextView GPS_STATUS, LAST_UPDATE, RESULT_GPS;
     private Button START_LOCATION_UPDATES, STOP_LOCATION_UPDATES, GET_LAST_UPDATE;
-    private Boolean RequestingLocationUpdates;
     private boolean gps;
-    private String LastUpdateTime;
     // GPS LOCATION API:
-    private FusedLocationProviderClient fusedLocationProviderClient;
-    private SettingsClient settingsClient;
-    private LocationRequest locationRequest;
-    private LocationSettingsRequest locationSettingsRequest;
-    private LocationCallback locationCallback;
-    private Location currentLocation;
+    private LocationListener locationListener;
 
     @Override
     public void onStart(){
         Log.w(TAG, "onStart():: " + "THE APPLICATION STARTED...");
         super.onStart();
         GPS_STATUS.setText(" ");
-        for (int g = 0; g < 0b11; g++) {
+        for (g = 0b0; g < 0b11; g += 0b1) {
             CheckGPS();
         }
         Log.w(TAG, "S.O.S: " + "CHECKING GPS....");
@@ -118,202 +67,32 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // _BUTTERKNIFE_
-        ButterKnife.bind(MainActivity.this);
         // DECLARATION:
         GPS_STATUS = findViewById(R.id.gps);
         LAST_UPDATE = findViewById(R.id.lasttupdate);
         START_LOCATION_UPDATES = findViewById(R.id.start);
         STOP_LOCATION_UPDATES = findViewById(R.id.stop);
-        GET_LAST_UPDATE = findViewById(R.id.get);
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
-        settingsClient = LocationServices.getSettingsClient(MainActivity.this);
-        locationCallback = new LocationCallback(){
+        RESULT_GPS = findViewById(R.id.result);
+
+        LOCATION_MANAGER = (LocationManager)  getSystemService(Context.LOCATION_SERVICE);
+
+
+        START_LOCATION_UPDATES.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onLocationResult(LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-                // WHEN LOCATION IS RECEIVE ::
-                currentLocation = locationResult.getLastLocation();
-                LastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-                
-                UPDATE_LOCATION_UI();
+            public void onClick(View v) {
+
             }
-        };
-
-        RequestingLocationUpdates = false;
-        locationRequest = new LocationRequest();
-        locationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-        locationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(locationRequest);
-        locationSettingsRequest = builder.build();
-
-
-//        STOP_LOCATION_UPDATES.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // REQUESTING ```ACCESS_FINE_LOCATION``` USING DEXTER LIBRARY
-//                Dexter.withActivity(MainActivity.this)
-//                        .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-//                        .withListener(new PermissionListener() {
-//                            @Override
-//                            public void onPermissionGranted(PermissionGrantedResponse response) {
-//                                RequestingLocationUpdates = true;
-//                                START_LOCATION_UPDATES_METHODS();
-//                            }
-//
-//                            @Override
-//                            public void onPermissionDenied(PermissionDeniedResponse response) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-//
-//                            }
-//                        });
-//            }
-//        });
-
-
-        // _RESTORING_VALUES_FROM_SAVED_INSTANCE_STATE_
-        //RESTORE_VALUES_FROM_BUNDLE(savedInstanceState);
-    }
-
-    private void START_LOCATION_UPDATES_METHODS() {
-        settingsClient
-                .checkLocationSettings(locationSettingsRequest)
-                .addOnSuccessListener(MainActivity.this, new OnSuccessListener<LocationSettingsResponse>() {
-                    @SuppressLint("MissingPermission")
-                    @Override
-                    public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                        Log.w(TAG, "START_LOCATION_UPDATES_METHODS ===> " + "All location settings are satisfied.");
-                        TOASTER("Started Location Updates...");
-                        // NO-INSPECTION MISSING_PERMISSION:
-                        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-                        UPDATE_LOCATION_UI();
-                    }
-                }).addOnFailureListener(MainActivity.this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        int STATUS_CODE = ((ApiException) exception).getStatusCode();
-                        switch (STATUS_CODE){
-                           // TODO "Still figuring"
-                        }
-                    }
         });
     }
 
-    @OnClick(R.id.start)
-    public void startLOCATIONBtn(){
-        //REQUESTING ```ACCESS_FINE_LOCATION``` USING DEXTER LIBRARY
-        Dexter.withActivity(MainActivity.this)
-                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                .withListener(new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted(PermissionGrantedResponse response) {
-                        RequestingLocationUpdates = true;
-                        START_LOCATION_UPDATES_METHODS();
-                    }
-
-                    @Override
-                    public void onPermissionDenied(PermissionDeniedResponse response) {
-                        if (response.isPermanentlyDenied()){
-                            // OPEN DEVICE SETTINGS WHEN THE PERMISSION IS DENIED PERMANENTLY
-                            OPEN_SETTING();
-                        }
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-                        token.cancelPermissionRequest();
-                    }
-                }).check();
-    }
-
-    @OnClick(R.id.stop)
-    public void stopLOCATIONbtn(){
-        RequestingLocationUpdates = false;
-        STOP_LOCATION_UPDATES();
-    }
-
-    private void STOP_LOCATION_UPDATES() {
-        // REMOVING LOCATION UPDATES
-        fusedLocationProviderClient
-                .removeLocationUpdates(locationCallback)
-                .addOnCompleteListener(MainActivity.this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        TOASTER("Location updates stopped!");
-                        TOGGLE_BUTTON();
-                    }
-                });
-    }
-
-    private void OPEN_SETTING() {
-        Intent intent = new Intent();
-        intent.setAction(
-                Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package",
-                BuildConfig.APPLICATION_ID, null);
-        intent.setData(uri);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
-    // UPDATE THE USER INTERFACE THE LOCATION DATA AND TOGGLING THE BUTTONS:
     @SuppressLint("SetTextI18n")
-    private void UPDATE_LOCATION_UI() {
-        if(currentLocation != null){
-            String LA, LO, TAGGER;
-            LA = getResources().getString(R.string.Latitude);
-            LO = getResources().getString(R.string.Longitude);
-            TAGGER = getResources().getString(R.string.last_update);
-            THE_LOCATION_RESULT.setText(LA + currentLocation.getLatitude() + LO + currentLocation.getLongitude());
-            // GIVING A ```BLINK``` EFFECT ON TEXTVIEW:
-            THE_LOCATION_RESULT.setAlpha(0);
-            THE_LOCATION_RESULT.animate().alpha(1).setDuration(300);
-            // LAST UPDATED TIME :
-            THE_LAST_UPDATE.setText(TAGGER + " " + THE_LAST_UPDATE);
-        }
-        TOGGLE_BUTTON();
+    public void onLocationChanged(Location location){
+        String LA, LO;
+        LA = getResources().getString(R.string.Latitude);
+        LO = getResources().getString(R.string.Longitude);
+        RESULT_GPS.setText(LA + location.getLatitude() + "::" + LO + location.getLongitude());
     }
 
-    private void TOGGLE_BUTTON() {
-        if (RequestingLocationUpdates){
-            START_LOCATION.setEnabled(false);
-            STOP_LOCATION.setEnabled(true);
-        } else {
-            START_LOCATION.setEnabled(true);
-            STOP_LOCATION.setEnabled(false);
-        }
-    }
-
-    // RESTORING VALUES FROM SAVED INSTANCE STATE:
-    private void RESTORE_VALUES_FROM_BUNDLE(Bundle savedInstanceState){
-        if (savedInstanceState != null){
-            if (savedInstanceState.containsKey("is_requesting_updates")){
-                RequestingLocationUpdates = savedInstanceState.getBoolean("is_requesting_updates");
-            }
-            if (savedInstanceState.containsKey("last_known_location")){
-                currentLocation = savedInstanceState.getParcelable("last_known_location");
-            }
-            if (savedInstanceState.containsKey("last_updated_on")) {
-                LastUpdateTime = savedInstanceState.getString("last_updated_on");
-            }
-        }
-        UPDATE_LOCATION_UI();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean("is_requesting_updates",RequestingLocationUpdates);
-        outState.putParcelable("last_known_location", currentLocation);
-        outState.putString("last_updated_on", LastUpdateTime);
-    }
 
     // TOAST.MAKE_TEXT METHODS():
     public void TOASTER(String toast){
