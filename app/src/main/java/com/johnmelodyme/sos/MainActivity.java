@@ -13,17 +13,19 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -41,11 +43,11 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
-
 import java.text.DateFormat;
 import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * @AUTHOR: JOHN MELODY MELIISA
@@ -146,31 +148,32 @@ public class MainActivity extends AppCompatActivity {
                 .addLocationRequest(locationRequest);
         locationSettingsRequest = builder.build();
 
-        STOP_LOCATION_UPDATES.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // REQUESTING ```ACCESS_FINE_LOCATION``` USING DEXTER LIBRARY
-                Dexter.withActivity(MainActivity.this)
-                        .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                        .withListener(new PermissionListener() {
-                            @Override
-                            public void onPermissionGranted(PermissionGrantedResponse response) {
-                                RequestingLocationUpdates = true;
-                                START_LOCATION_UPDATES_METHODS();
-                            }
 
-                            @Override
-                            public void onPermissionDenied(PermissionDeniedResponse response) {
-
-                            }
-
-                            @Override
-                            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-
-                            }
-                        });
-            }
-        });
+//        STOP_LOCATION_UPDATES.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                // REQUESTING ```ACCESS_FINE_LOCATION``` USING DEXTER LIBRARY
+//                Dexter.withActivity(MainActivity.this)
+//                        .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+//                        .withListener(new PermissionListener() {
+//                            @Override
+//                            public void onPermissionGranted(PermissionGrantedResponse response) {
+//                                RequestingLocationUpdates = true;
+//                                START_LOCATION_UPDATES_METHODS();
+//                            }
+//
+//                            @Override
+//                            public void onPermissionDenied(PermissionDeniedResponse response) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+//
+//                            }
+//                        });
+//            }
+//        });
 
 
         // _RESTORING_VALUES_FROM_SAVED_INSTANCE_STATE_
@@ -199,6 +202,44 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
         });
+    }
+
+    @OnClick(R.id.start)
+    public void startLOCATIONBtn(){
+        //REQUESTING ```ACCESS_FINE_LOCATION``` USING DEXTER LIBRARY
+        Dexter.withActivity(MainActivity.this)
+                .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        RequestingLocationUpdates = true;
+                        START_LOCATION_UPDATES_METHODS();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+                        if (response.isPermanentlyDenied()){
+                            // OPEN DEVICE SETTINGS WHEN THE PERMISSION IS DENIED PERMANENTLY
+                            OPEN_SETTING();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                        token.cancelPermissionRequest();
+                    }
+                }).check();
+    }
+
+    private void OPEN_SETTING() {
+        Intent intent = new Intent();
+        intent.setAction(
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package",
+                BuildConfig.APPLICATION_ID, null);
+        intent.setData(uri);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     // UPDATE THE USER INTERFACE THE LOCATION DATA AND TOGGLING THE BUTTONS:
