@@ -11,16 +11,17 @@ package com.johnmelodyme.sos;
  */
 import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 
 /**
@@ -31,23 +32,30 @@ import com.google.android.gms.location.LocationListener;
  */
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getName();
-    private int g;
-    private LocationManager LOCATION_MANAGER;
-    private TextView GPS_STATUS, LAST_UPDATE, RESULT_GPS;
-    private Button START_LOCATION_UPDATES, STOP_LOCATION_UPDATES, GET_LAST_UPDATE;
+    private WifiManager WIFI_MANAGER;
+    private final static int REQUEST_CHECK_SETTINGS_GPS= 0b1;
+    private final static int REQUEST_ID_MULTIPLE_PERMISSIONS= 0b10;
+    private int T;
+    private TextView GPS_STATUS, LONG, LA, ANIM;
     private boolean gps;
     // GPS LOCATION API:
     private LocationListener locationListener;
+    private LocationManager LOCATION_MANAGER;
+    private Location LOCATION;
+    private GoogleApiClient GOOGLE_API_CLIENT;
+    private String IP_ADDRESS;
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onStart(){
         Log.w(TAG, "onStart():: " + "THE APPLICATION STARTED...");
         super.onStart();
         GPS_STATUS.setText(" ");
-        for (g = 0b0; g < 0b11; g += 0b1) {
+        for (T = 0b0; T < 0b11; T += 0b1) {
             CheckGPS();
         }
         Log.w(TAG, "S.O.S: " + "CHECKING GPS....");
+        ANIM.setText("IP: "+ IP_ADDRESS);
     }
 
     private void CheckGPS() {
@@ -67,22 +75,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // DECLARATION:
+        // DECLARATION ==>
+        WIFI_MANAGER = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        if (WIFI_MANAGER != null) {
+            IP_ADDRESS = Formatter.formatIpAddress(WIFI_MANAGER.getConnectionInfo().getIpAddress());
+        }
         GPS_STATUS = findViewById(R.id.gps);
-        LAST_UPDATE = findViewById(R.id.lasttupdate);
-        START_LOCATION_UPDATES = findViewById(R.id.start);
-        STOP_LOCATION_UPDATES = findViewById(R.id.stop);
-        RESULT_GPS = findViewById(R.id.result);
+        LONG = findViewById(R.id.LONG);
+        LA = findViewById(R.id.LAT);
+        ANIM = findViewById(R.id.anim);
 
-        LOCATION_MANAGER = (LocationManager)  getSystemService(Context.LOCATION_SERVICE);
-
-
-        START_LOCATION_UPDATES.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
     }
 
     @SuppressLint("SetTextI18n")
@@ -90,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         String LA, LO;
         LA = getResources().getString(R.string.Latitude);
         LO = getResources().getString(R.string.Longitude);
-        RESULT_GPS.setText(LA + location.getLatitude() + "::" + LO + location.getLongitude());
+        //RESULT_GPS.setText(LA + location.getLatitude() + "::" + LO + location.getLongitude());
     }
 
 
