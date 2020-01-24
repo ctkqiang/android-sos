@@ -88,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onStart(){
-        System.out.println("WELCOME TO SOS");
         Log.w(TAG, "onStart():: " + "THE APPLICATION STARTED...");
         super.onStart();
         GPS_STATUS.setText(" ");
@@ -117,8 +116,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         // _BUTTERKNIFE_
         ButterKnife.bind(MainActivity.this);
-        // _RESTORING_VALUES_FROM_SAVED_INSTANCE_STATE_
-        //RESTORE_VALUES_FROM_BUNDLE(savedInstanceState);
         // DECLARATION:
         GPS_STATUS = findViewById(R.id.gps);
         LAST_UPDATE = findViewById(R.id.lasttupdate);
@@ -174,6 +171,10 @@ public class MainActivity extends AppCompatActivity {
                         });
             }
         });
+
+
+        // _RESTORING_VALUES_FROM_SAVED_INSTANCE_STATE_
+        //RESTORE_VALUES_FROM_BUNDLE(savedInstanceState);
     }
 
     private void START_LOCATION_UPDATES_METHODS() {
