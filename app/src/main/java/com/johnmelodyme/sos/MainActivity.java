@@ -35,8 +35,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -229,6 +231,25 @@ public class MainActivity extends AppCompatActivity {
                         token.cancelPermissionRequest();
                     }
                 }).check();
+    }
+
+    @OnClick(R.id.stop)
+    public void stopLOCATIONbtn(){
+        RequestingLocationUpdates = false;
+        STOP_LOCATION_UPDATES();
+    }
+
+    private void STOP_LOCATION_UPDATES() {
+        // REMOVING LOCATION UPDATES
+        fusedLocationProviderClient
+                .removeLocationUpdates(locationCallback)
+                .addOnCompleteListener(MainActivity.this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        TOASTER("Location updates stopped!");
+                        TOGGLE_BUTTON();
+                    }
+                });
     }
 
     private void OPEN_SETTING() {
