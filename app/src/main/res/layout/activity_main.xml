@@ -26,8 +26,8 @@
         android:id="@+id/LAT"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginTop="177dp"
-        android:layout_marginBottom="41dp"
+        android:layout_marginTop="154dp"
+        android:layout_marginBottom="55dp"
         android:fontFamily="serif-monospace"
         android:text="TextView"
         android:textAlignment="center"
@@ -36,6 +36,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/LONG"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/gps" />
 
@@ -43,7 +44,7 @@
         android:id="@+id/LONG"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginBottom="284dp"
+        android:layout_marginTop="12dp"
         android:fontFamily="serif-monospace"
         android:text="TextView"
         android:textAlignment="center"
@@ -51,7 +52,6 @@
         android:textColor="@color/hk"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/anim"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/LAT" />
@@ -67,6 +67,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

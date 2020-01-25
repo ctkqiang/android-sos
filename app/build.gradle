@@ -36,4 +36,6 @@ dependencies {
     // ButterKnife view binding
     //implementation 'com.jakewharton:butterknife:10.0.0'
     //annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
+    implementation 'com.microsoft.maps:maps-sdk:1.0.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:8.6.2'
 }

@@ -9,9 +9,13 @@ package com.johnmelodyme.sos;
 * (JOHN MELODY'S OPEN SOURCE PROJECT)
 * ALL RIGHT RESERVED © JOHN MELODY MELISSA COPYRIGHT
  */
-import androidx.appcompat.app.AppCompatActivity;
+
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
@@ -20,6 +24,8 @@ import android.text.format.Formatter;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -30,20 +36,22 @@ import com.google.android.gms.location.LocationListener;
  * @INSPIRED_BY__MY_GIRLFRIEND: SIN DEE 🥰🥰🥰
  * @DESCRIPTION: CREATED FOR WOMEN SECURITY ::
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LocationListener {
     private static final String TAG = MainActivity.class.getName();
     private WifiManager WIFI_MANAGER;
     private final static int REQUEST_CHECK_SETTINGS_GPS= 0b1;
     private final static int REQUEST_ID_MULTIPLE_PERMISSIONS= 0b10;
     private int T;
-    private TextView GPS_STATUS, LONG, LA, ANIM;
+    private TextView GPS_STATUS, LONG, LAT, ANIM;
     private boolean gps;
     // GPS LOCATION API:
     private LocationListener locationListener;
     private LocationManager LOCATION_MANAGER;
     private Location LOCATION;
-    private GoogleApiClient GOOGLE_API_CLIENT;
+    private GoogleApiClient.Builder GOOGLE_API_CLIENT;
     private String IP_ADDRESS;
+    private String provider;
+    private Criteria criteria;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -59,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void CheckGPS() {
-        LOCATION_MANAGER = (LocationManager) MainActivity.this.getSystemService(MainActivity.this.LOCATION_SERVICE);
         gps = LOCATION_MANAGER.isProviderEnabled(LOCATION_MANAGER.GPS_PROVIDER);
         if (gps == true){
             GPS_STATUS.setText("GPS IS ENABLED");
@@ -76,23 +83,47 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // DECLARATION ==>
+        LOCATION_MANAGER = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        //LOCATION_MANAGER.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0b1111101000, 0b0, this);
         WIFI_MANAGER = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         if (WIFI_MANAGER != null) {
             IP_ADDRESS = Formatter.formatIpAddress(WIFI_MANAGER.getConnectionInfo().getIpAddress());
         }
+        criteria = new Criteria();
+        provider = LOCATION_MANAGER.getBestProvider(criteria, false);
         GPS_STATUS = findViewById(R.id.gps);
         LONG = findViewById(R.id.LONG);
-        LA = findViewById(R.id.LAT);
+        LAT = findViewById(R.id.LAT);
         ANIM = findViewById(R.id.anim);
+
+        if (provider != null && !provider.equals("")){
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+
+            LOCATION = LOCATION_MANAGER.getLastKnownLocation(provider);
+            LOCATION_MANAGER.requestLocationUpdates(provider, 0b11101010011000, 0b1, (android.location.LocationListener) MainActivity.this);
+
+            if (LOCATION != null){
+                onLocationChanged(LOCATION);
+            } else {
+                TOASTER("No Location Provider Found.");
+            }
+        }
 
     }
 
     @SuppressLint("SetTextI18n")
+    @Override
     public void onLocationChanged(Location location){
         String LA, LO;
         LA = getResources().getString(R.string.Latitude);
         LO = getResources().getString(R.string.Longitude);
-        //RESULT_GPS.setText(LA + location.getLatitude() + "::" + LO + location.getLongitude());
+
+        LAT.setText(LA + LOCATION.getLatitude());
+        LONG.setText(LO + LOCATION.getLongitude());
     }
 
 
